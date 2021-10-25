@@ -18,13 +18,17 @@ function install_postgres {
   sudo chmod 600 ~/.pgpass
   sudo chmod 666 /etc/postgresql/12/main/postgresql.conf
   sudo chmod 666 /etc/postgresql/12/main/pg_hba.conf
-  sudo echo "standard_conforming_strings = off" >> /etc/postgresql/12/main/postgresql.conf
-  sudo echo "listen_addresses = '*'" >> /etc/postgresql/12/main/postgresql.conf
-  sudo echo "#TYPE   DATABASE  USER  CIDR-ADDRESS  METHOD" > /etc/postgresql/12/main/pg_hba.conf
-  sudo echo "local   all       all                 trust" >> /etc/postgresql/12/main/pg_hba.conf
-  sudo echo "host    all       all   127.0.0.1/32  trust" >> /etc/postgresql/12/main/pg_hba.conf
-  sudo echo "host    all       all   ::1/128       trust" >> /etc/postgresql/12/main/pg_hba.conf
-  sudo echo "host    all       all   0.0.0.0/0     md5" >> /etc/postgresql/12/main/pg_hba.conf
+  sudo tee -a /etc/postgresql/12/main/postgresql.conf >> /dev/null <<EOF
+standard_conforming_strings = off
+listen_addresses = '*'
+EOF
+  sudo tee -a /etc/postgresql/12/main/pg_hba.conf > /dev/null << EOF
+#TYPE   DATABASE  USER  CIDR-ADDRESS  METHOD
+local   all       all                 trust
+host    all       all   127.0.0.1/32  trust     
+host    all       all   ::1/128       trust
+host    all       all   0.0.0.0/0     md5
+EOF
   sudo service postgresql restart
 
   sudo -u postgres createdb -E UTF8 -T template0 --locale=en_US.utf8 template_postgis
@@ -37,14 +41,16 @@ function install_postgres {
 }
 
 function install_couchdb {
-  sudo add-apt-repository "deb https://apache.bintray.com/couchdb-deb $(lsb_release -sc) main"
-  wget --quiet -O - https://couchdb.apache.org/repo/bintray-pubkey.asc | sudo apt-key add -
+  sudo apt update && sudo apt install -y curl apt-transport-https gnupg
+  curl https://couchdb.apache.org/repo/keys.asc | gpg --dearmor | sudo tee /usr/share/keyrings/couchdb-archive-keyring.gpg >/dev/null 2>&1
+  echo "deb [signed-by=/usr/share/keyrings/couchdb-archive-keyring.gpg] https://apache.jfrog.io/artifactory/couchdb-deb/ $(lsb_release -sc) main" \
+    | sudo tee /etc/apt/sources.list.d/couchdb.list >/dev/null
   sudo apt-get update
   sudo apt-get install couchdb
 }
 
 function install_yarn {
-  wget --quiet -O - https://deb.nodesource.com/setup_16.x | sudo -E bash -
+  wget --quiet -O - https://deb.nodesource.com/setup_14.x | sudo -E bash -
   sudo apt-get update
   sudo apt-get install -y nodejs
   sudo apt install curl
@@ -65,24 +71,41 @@ function install_elasticsearch {
   sudo systemctl start elasticsearch.service
 }
 
+function install_python {
+  python_package=3
+
+  python_version=$(apt-cache show python3-dev | grep Version: | awk -F '[ -]' '{print $2}' | head -n1)
+
+  if [[ $python_version < 3.7 ]]; then
+	  sudo apt-get purge python3-dev python3-venv
+	  python_package=3.7
+  fi
+
+  sudo apt-get install -y python${python_package}-dev
+  sudo apt-get install -y python${python_package}-venv
+  python
+}
+
 function main {
+  INSTALL_DEPENDENCIES=" \
+	        lsb-core
+		make \
+		software-properties-common \
+		build-essential \
+		libxml2-dev \
+		libproj-dev \
+		libjson-c-dev \
+		xsltproc \
+		docbook-xsl \
+                docbook-mathml \
+                libgdal-dev \
+		libpq-dev \
+		"
   sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
   sudo apt-get update -y
-  sudo apt-get install -y make software-properties-common
-  #sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+  sudo apt-get install -y $INSTALL_DEPENDENCIES
 
-  sudo apt-get install -y build-essential
-  sudo apt-get install -y libxml2-dev
-  sudo apt-get install -y libproj-dev
-  sudo apt-get install -y libjson-c-dev
-  sudo apt-get install -y xsltproc
-  sudo apt-get install -y docbook-xsl
-  sudo apt-get install -y docbook-mathml
-  sudo apt-get install -y libgdal-dev
-  sudo apt-get install -y libpq-dev
-
-  sudo apt-get install -y python3-dev
-  sudo apt-get install -y python3-venv
+  install_python
 
   echo -n "Would you like to install elasticsearch? (y/N)? "
   read answer

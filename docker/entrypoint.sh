@@ -63,6 +63,7 @@ cd_yarn_folder() {
 
 activate_virtualenv() {
 	. ${WEB_ROOT}/ENV/bin/activate
+	echo `python3 --version`
 }
 
 
@@ -211,6 +212,8 @@ install_yarn_components() {
 init_arches_project() {
 	if [[ ! -z ${ARCHES_PROJECT} ]]; then
 		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
+
+		echo "APP_FOLDER IS ${APP_FOLDER}, thank you"
 		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls ${APP_FOLDER})" ]]; then
 			echo ""
 			echo "----- Custom Arches project '${ARCHES_PROJECT}' does not exist. -----"
@@ -220,7 +223,7 @@ init_arches_project() {
 			cd_web_root
 			[[ -d ${APP_FOLDER} ]] || mkdir ${APP_FOLDER}
 
-			arches-project create ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
+			arches-project create ${ARCHES_PROJECT}
 
 			exit_code=$?
 			if [[ ${exit_code} != 0 ]]; then
