@@ -658,13 +658,17 @@ input[type="checkbox"] {
 
 .tabbed-workflow-step-information-box {
     padding: 10px 35px 20px 35px;
-    background-color: #eaeaea;
+    background-color: #fafafa;
     border: 1px solid #ddd;
     color: grey;
     margin: -16px -21px 0px -21px;
     height: 100px;
     overflow-y: scroll;
     position: relative;
+}
+
+.workflow-information-box-toggle:hover {
+    color: #454545;
 }
 
 .btn-workflow-tile {
@@ -721,8 +725,9 @@ input[type="checkbox"] {
 }
 
 .tabbed-workflow-footer {
-    background-color: #fafafa;
-    border-top: 1px solid #ddd;
+    background-color: #445769;
+    border-top: 1px solid #0E2031;
+    color: #f9f9f9;
     padding: 10px 12px;
     display: flex;
     justify-content: space-between;
@@ -1268,6 +1273,7 @@ ul.tabbed-report-tab-list {
     color: steelblue;
     font-size: 11px;
     padding-left: 5px;
+    padding-top: 5px;
 }
 
 .file-workbench-files::-webkit-scrollbar {
@@ -8331,7 +8337,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .create-resource-instance-card-component {
-    position: absolute;
+    position: fixed;
     background: #fcfcfc;
     z-index: 11;
     height: 95%;
@@ -8352,6 +8358,7 @@ a.mega-dropdown-toggle.disabled {
     overflow-x: hidden;
     transform: translate(100%, 0);
     transition: all 0.3s ease-out;
+    padding-left: 50px;
 }
 
 .create-resource-instance-card-component.rr-table-pop .rp-edit-buttons {
@@ -9377,6 +9384,7 @@ a#close-map-tools.map-widget-icon:hover {
     padding-left: 12px;
     border-radius: 3px;
     margin-bottom: 5px;
+    height: 75px;
 }
 
 .buffer-control h5 {
@@ -13371,6 +13379,8 @@ a.jstree-anchor.permissions-widget {
     display: inline-flex;
     justify-content: space-between;
     width: 100%;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 3px;
 }
 
 .gallery-expanded .iiif-gallery-header {
