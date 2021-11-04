@@ -1,3 +1,18 @@
-FROM ubuntu:20.04
+FROM python:3.9.7-slim
 
+RUN apt -y update
+RUN apt install -y wget curl libgdal-dev make build-essential
+RUN wget --quiet -O - https://deb.nodesource.com/setup_14.x | bash -
+RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /usr/share/keyrings/yarnkey.gpg >/dev/null
+RUN echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt-get update
+RUN apt-get install -y nodejs yarn
 
+RUN pip install arches
+
+RUN mkdir -f /opt/arches
+COPY docker/entrypoint.sh
+RUN arches-project create my_project
+WORKDIR my_project
+RUN python manage.py setup_db --force
+CMD ["python", "manage.py", "runserver"]

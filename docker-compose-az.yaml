@@ -3,7 +3,11 @@ services:
 
     arches:
       container_name: arches
-      image: captwolf/arches:5.0
+      #image: getty/arches:5.0
+      image: archesprojecttest.azurecr.io/arches:5.0
+      #build:
+      #  context: .
+      #  dockerfile: ./Dockerfile
       command: run_arches
       volumes:
         - arches-log:/arches/arches/logs
@@ -37,7 +41,7 @@ services:
 
     nginx:
       container_name: nginx
-      image: cvast/cvast-nginx:1.2.0
+      image: iarchesprojecttest.azurecr.io/cvast-nginx:1.2.0
       restart: unless-stopped
       ports:
         - '80:80'
@@ -59,7 +63,7 @@ services:
 
     db:
       container_name: db
-      image: kartoza/postgis:12.0
+      image: archesprojecttest.azurecr.io/postgis:12.0
       volumes:
           - postgres-data:/var/lib/postgresql/data
           - postgres-log:/var/log/postgresql
@@ -87,7 +91,7 @@ services:
 
     elasticsearch:
       container_name: elasticsearch
-      image: elasticsearch:7.5.1
+      image: archesprojecttest.azurecr.io/elasticsearch:7.5.1
       volumes:
         - elasticsearch-data:/usr/share/elasticsearch/data
       ports:
@@ -101,7 +105,7 @@ services:
 
     letsencrypt:
       container_name: letsencrypt
-      image: cvast/cvast-letsencrypt:1.1
+      image: archesprojecttest.azurecr.io/cvast-letsencrypt:1.1
       volumes:
         - letsencrypt-acme-challenge:/var/www
         - letsencrypt:/etc/letsencrypt

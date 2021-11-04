@@ -221,7 +221,7 @@ init_arches_project() {
 			echo ""
 
 			cd_web_root
-			[[ -d ${APP_FOLDER} ]] || mkdir ${APP_FOLDER}
+			#[[ -d ${APP_FOLDER} ]] || mkdir ${APP_FOLDER}
 
 			arches-project create ${ARCHES_PROJECT}
 
