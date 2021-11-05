@@ -63,6 +63,7 @@ cd_yarn_folder() {
 
 activate_virtualenv() {
 	. ${WEB_ROOT}/ENV/bin/activate
+	echo `python3 --version`
 }
 
 
@@ -80,6 +81,11 @@ init_arches() {
 	fi
 
 	init_arches_project
+	
+	echo "**********  Importation du package **********************"
+        python manage.py packages -o load_package -s https://github.com/archesproject/v5_demo/archive/refs/heads/master.zip -db
+	echo "********************** egakcap ud noitatropmI  **********"
+
 }
 
 
@@ -211,6 +217,8 @@ install_yarn_components() {
 init_arches_project() {
 	if [[ ! -z ${ARCHES_PROJECT} ]]; then
 		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
+
+		echo "APP_FOLDER IS ${APP_FOLDER}, thank you"
 		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls ${APP_FOLDER})" ]]; then
 			echo ""
 			echo "----- Custom Arches project '${ARCHES_PROJECT}' does not exist. -----"
@@ -218,9 +226,9 @@ init_arches_project() {
 			echo ""
 
 			cd_web_root
-			[[ -d ${APP_FOLDER} ]] || mkdir ${APP_FOLDER}
+			#[[ -d ${APP_FOLDER} ]] || mkdir ${APP_FOLDER}
 
-			arches-project create ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
+			arches-project create ${ARCHES_PROJECT}
 
 			exit_code=$?
 			if [[ ${exit_code} != 0 ]]; then
@@ -234,6 +242,7 @@ init_arches_project() {
 			echo "Custom Arches project '${ARCHES_PROJECT}' already exists."
 		fi
 	fi
+	python manage.py packages -o load_package -s https://github.com/archesproject/v5_demo/archive/refs/heads/master.zip -db
 }
 
 
@@ -355,11 +364,11 @@ run_arches() {
 	fi
 
 	run_custom_scripts
+	collect_static
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 		run_django_server
 	elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
-		collect_static
 		run_gunicorn_server
 	fi
 }

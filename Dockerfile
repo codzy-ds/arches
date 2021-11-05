@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 as base 
+FROM ubuntu:20.04 as base 
 USER root
 
 ## Setting default environment variables
@@ -42,10 +42,10 @@ RUN set -ex \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && python3.8 get-pip.py
 
-RUN pip3 wheel --no-cache-dir -b /tmp -r ${WHEELS}/requirements.txt  \
-    && pip3 wheel --no-cache-dir -b /tmp -r ${WHEELS}/requirements_dev.txt  \
-    && pip3 wheel --no-cache-dir -b /tmp gunicorn \
-    && pip3 wheel --no-cache-dir -b /tmp django-auth-ldap
+RUN pip3 wheel --no-cache-dir -r ${WHEELS}/requirements.txt  \
+    && pip3 wheel --no-cache-dir -r ${WHEELS}/requirements_dev.txt  \
+    && pip3 wheel --no-cache-dir gunicorn \
+    && pip3 wheel --no-cache-dir django-auth-ldap
 
 # Add Docker-related files
 COPY docker/entrypoint.sh ${WHEELS}/entrypoint.sh
@@ -75,7 +75,7 @@ RUN set -ex \
         python3.8-venv \
     " \
     && apt-get install -y --no-install-recommends curl \
-    && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
     && curl -sL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" \
     && apt-get update -y \
@@ -83,12 +83,14 @@ RUN set -ex \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && python3.8 get-pip.py \
     && apt-get install -y nodejs \
-    && npm install -g yarn
+    && npm install -g yarn \
+    && apt-get clean \
+    && apt-get autoclean
 
 # Install Yarn components
-COPY ./arches/install/package.json ${ARCHES_ROOT}/arches/install/package.json
-COPY ./arches/install/.yarnrc ${ARCHES_ROOT}/arches/install/.yarnrc
-COPY ./arches/install/yarn.lock ${ARCHES_ROOT}/arches/install/yarn.lock
+COPY ./package.json ${ARCHES_ROOT}/arches/install/package.json
+COPY ./.yarnrc ${ARCHES_ROOT}/arches/install/.yarnrc
+COPY ./yarn.lock ${ARCHES_ROOT}/arches/install/yarn.lock
 WORKDIR ${ARCHES_ROOT}/arches/install
 RUN mkdir -p ${ARCHES_ROOT}/arches/app/media/packages
 RUN yarn install
@@ -100,6 +102,9 @@ RUN mv ${WHEELS}/entrypoint.sh entrypoint.sh
 
 RUN python3.8 -m venv ENV \
     && . ENV/bin/activate \
+    && pip install --upgrade pip \
+    && pip install rust \
+    && pip install setuptools_rust \
     && pip install requests \
     && pip install -f ${WHEELS} django-auth-ldap \
     && pip install -f ${WHEELS} gunicorn \

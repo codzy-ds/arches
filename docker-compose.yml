@@ -3,17 +3,14 @@ services:
 
     arches:
       container_name: arches
-      image: getty/arches:5.0
-      build:
-        context: .
-        dockerfile: ./Dockerfile
+      image: captwolf/arches:6.0 
       command: run_arches
       volumes:
         - arches-log:/arches/arches/logs
         - arches-static:/static_root
       environment:
         - INSTALL_DEFAULT_GRAPHS=False
-        - INSTALL_DEFAULT_CONCEPTS=False
+        - INSTALL_DEFAULT_CONCEPTS=True
         - PGUSERNAME=postgres
         - PGPASSWORD=postgres
         - PGDBNAME=arches
@@ -25,11 +22,12 @@ services:
         - COUCHDB_PASS=password
         - ESHOST=elasticsearch
         - ESPORT=9200
-        - DJANGO_MODE=PROD
+        - DJANGO_MODE=DEV
         - DJANGO_DEBUG=False
         - DOMAIN_NAMES=localhost
+        - ARCHES_PROJECT=projetmitch
         - PYTHONUNBUFFERED=0
-        - TZ=PST
+        - TZ=EDT
       ports:
         - '8000:8000'
       depends_on:
@@ -55,7 +53,7 @@ services:
         - LOCAL_PROXY_PORT=8000
         - DOMAIN_NAMES=localhost
         - PUBLIC_MODE=False
-        - TZ=PST
+        - TZ=EDT
       depends_on:
         - arches
 
@@ -73,7 +71,7 @@ services:
         - POSTGRES_PASS=postgres
         - POSTGRES_DB=postgres
         - POSTGRES_MULTIPLE_EXTENSIONS=postgis,postgis_topology
-        - TZ=PST
+        - TZ=EDT
 
     couchdb:
       container_name: couchdb
@@ -96,7 +94,7 @@ services:
         - "9200:9200"
         - "9300:9300"
       environment:
-        - TZ=PST
+        - TZ=EDT
         - discovery.type=single-node
         - discovery.seed_hosts=
         - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
@@ -115,7 +113,7 @@ services:
         - DOMAIN_NAMES=localhost
         - PRODUCTION_MODE=False
         - PERSISTENT_MODE=True
-        - TZ=PST
+        - TZ=EDT
 
 volumes:
     arches-log:
