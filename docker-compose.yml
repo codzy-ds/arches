@@ -3,7 +3,7 @@ services:
 
     arches:
       container_name: arches
-      image: captwolf/arches:5.0
+      image: captwolf/arches:6.0
       command: run_arches
       volumes:
         - arches-log:/arches/arches/logs
