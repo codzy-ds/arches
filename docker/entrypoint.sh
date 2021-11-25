@@ -82,10 +82,6 @@ init_arches() {
 
 	init_arches_project
 	
-	echo "**********  Importation du package **********************"
-        python manage.py packages -o load_package -s https://github.com/archesproject/v5_demo/archive/refs/heads/master.zip -db
-	echo "********************** egakcap ud noitatropmI  **********"
-
 }
 
 
@@ -103,6 +99,9 @@ setup_arches() {
 
 	echo "Running: python manage.py setup_db --force"
 	python manage.py setup_db --force
+ 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	python manage.py load_ontology -s cidoc-crm
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     echo "Running: Creating couchdb system databases"
     curl -X PUT ${COUCHDB_URL}/_users
@@ -242,7 +241,6 @@ init_arches_project() {
 			echo "Custom Arches project '${ARCHES_PROJECT}' already exists."
 		fi
 	fi
-	python manage.py packages -o load_package -s https://github.com/archesproject/v5_demo/archive/refs/heads/master.zip -db
 }
 
 
